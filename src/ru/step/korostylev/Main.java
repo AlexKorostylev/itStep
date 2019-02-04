@@ -1,33 +1,61 @@
 package ru.step.korostylev;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import static ru.step.korostylev.Task.taskAll;
+import static ru.step.korostylev.Task.taskDetail;
 
 
 public class Main {
+    public static boolean nextTask = true;
 
     public static void main(String[] args) {
 
-        // Прописываем Путь к файлу где будут объекты храниться.
-        File taskFileAdres = new File("I:"+File.separator+"TaskFile.txt");
-        System.out.println("Абсолютный адрес файла: " + taskFileAdres.getAbsolutePath());
-        // Создаем реальный файл в ОС
-        Task.fileCreate(taskFileAdres);
-        // Как(какой) передать параметр в метод Task.createTask(????)
-        // чтобы введенное пользователем значение стало "Именем" ОБЪЕКТА сереализации?
-        // (строка кода 27), и ((строка кода 30 Task.java)
-        // Т.е хотел бы получить Task.createTask(task1) или (task2) или (task2) и т.д,
-        // но чтобы номер таска менялся от 1 до N с помощью декримента (чтобы вручную
-        // не писать)))
-        // Мне это нужно, чтобы иметь возможность десерилизовать объект обратно по
-        // уникальному имени или номеру объекта.
+        // укажите файл и папку для сохранения заметок
         Scanner sc = new Scanner(System.in);
-        System.out.println("Ведите заголовок задачи");
-        String taskName = sc.nextLine();
-        Task.createTask(taskName);
-        //Task.taskSave(taskFileAdres, task1);
-        //Task.taskSave(taskFileAdres, task2);
-        //Task.readTaskNum(taskFileAdres, task1);
-        //Task.readTaskNum(taskFileAdres, task2);
+
+        instructions();
+        System.out.println("Выберите номер команды");
+        System.out.print(">> ");
+        int command = sc.nextInt();
+        // Создаем реальный файл в ОС
+        File taskFileAdres = new File("I:"+File.separator+"TaskFile.txt");
+
+
+        switch (command){
+            case 1:
+                // Прописываем Путь к файлу где будут объекты храниться.
+                System.out.println("Абсолютный адрес файла: " + taskFileAdres.getAbsolutePath());
+                Task.fileCreate(taskFileAdres);
+                ArrayList<Task> tasks = new ArrayList<Task>();
+                while (nextTask){
+                    tasks.add(Task.taskCreate());
+                    System.out.println("Создать еще один таск? [true/false]");
+                    nextTask = sc.nextBoolean();
+                    if(!nextTask){
+                        Task.taskSave(taskFileAdres, tasks);
+                    }
+                }
+                break;
+            case 2:
+                System.out.println("Десериализация");
+                ArrayList<Task> desTaskArray = Task.readTasks(taskFileAdres);
+                System.out.println("Вывод названий всех задач в записной книжке");
+                taskAll(desTaskArray);
+                break;
+            case 3:
+                ArrayList<Task> desTaskArrayDetail = Task.readTasks(taskFileAdres);
+                taskDetail(desTaskArrayDetail);
+                break;
+        }
+    }
+    public static void instructions(){
+        System.out.println("Программа для записи списка задач");
+        System.out.println("Список комманд");
+        System.out.println("1 - создать новую заметку");
+        System.out.println("2 - вывести список всеx заметок");
+        System.out.println("3 - вывести детали конкретной заметки");
     }
 }
